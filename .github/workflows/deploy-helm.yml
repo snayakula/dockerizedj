@@ -1,0 +1,49 @@
+name: Deploy with Helm to Kubernetes
+
+on:
+  push:
+    branches: [ main ]  # Change 'main' to your desired branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # - name: Download kubectl config
+      #  uses: kubernetes-sigs/kubeconfig-download@v2  # Assuming v2 is available
+
+     # - name: Verify kubectl config
+     #   run: |
+    #      kubectl cluster-info
+
+      - name: Login to Azure ACR (if using ACR for images)
+        uses: azure/docker-login@v1  # Optional if using ACR images
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Pull image from ACR (if using ACR images)
+        run: |
+          ACR_REGISTRY=${{ secrets.ACR_LOGIN_SERVER }}
+          IMAGE_NAME=docdj  # Replace with your image name and version
+          docker pull $ACR_REGISTRY/$IMAGE_NAME:latest
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+
+      - name: Add Helm repo
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Deploy Helm Chart (assuming Chart.yaml is in the root)
+        run: |
+          helm upgrade --install dj-helm .
+            --set image.name=${{ secrets.ACR_LOGIN_SERVER }}/$IMAGE_NAME
+            
+env:
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  ACR_USERNAME: ${{ secrets.ACR_USERNAME }} 
+  ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}  

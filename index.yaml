@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  dj-helm:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-03-20T06:59:54.852874+05:30"
+    description: A Helm chart for Kubernetes
+    digest: 4de3c419e33ca2e3d88c2334cdd41bee232eee4da42be060213a41690216ebd6
+    name: dj-helm
+    type: application
+    urls:
+    - https://github.com/snayakula/dockerize.dj.git/dj-helm-0.1.0.tgz
+    version: 0.6.0
+generated: "2024-03-20T06:59:54.8464942+05:30"

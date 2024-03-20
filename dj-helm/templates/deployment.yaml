@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-docdj
+  labels:
+    app: docdj
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: docdj
+  template:
+    metadata:
+      labels:
+        app: docdj
+    spec:
+      containers:
+      - name: {{ .Chart.Name}}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 3000
+        - name: http
+        

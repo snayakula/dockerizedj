@@ -18,7 +18,7 @@ jobs:
        VERSION_MAJOR="1"
        VERSION_MINOR="0"
        VERSION_PATCH="0"
-       UPDATE_MAJOR=$(git tag --list "${VERSION_PREFIX}${VERSION_MAJOR}.*" --sort=-version:-refname | head -n 1 | grep -oE '[0-9]+$')
+       UPDATE_MAJOR=$(git tag --list "${VERSION_PREFIX}${VERSION_MAJOR}.*" --sort=-refname | head -n 1 | grep -oE '[0-9]+$')
        if [ -z "$UPDATE_MAJOR" ]; then
          UPDATE_MAJOR=1
        else

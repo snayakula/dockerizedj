@@ -1,27 +1,33 @@
-name: Custom Tag Increment
-
+name: Tag with major
 on:
-  push:
-    branches:
-      - 'main'
-
+ push:
+   branches:
+     - main
 jobs:
-  increment_tag:
-    runs-on: ubuntu-latest
-    permissions:
-     id-token: write #This is required for requesting the JWT
-     contents: read
-    steps:
-      - uses: actions/checkout@v2
-      - name: Get latest tag
-        id: get_tag
-        run: echo "::set-output name=tag::$(git describe --abbrev=0)"
-      - name: Increment tag
-        id: increment_tag
-        run: echo "::set-output name=next_tag::$(python increment_tag.py ${{ steps.get_tag.outputs.tag }})"
-      - name: Create new tag
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "git actions"
-          git tag ${{ steps.increment_tag.outputs.next_tag }}
-          git push origin ${{ steps.increment_tag.outputs.next_tag }}
+ build:
+   runs-on: ubuntu-latest
+   steps:
+   - name: Checkout repository
+     uses: actions/checkout@v2
+     with:
+         fetch-depth: '0'
+   - name: Generate Git Tag
+     id: generate_tag
+     run: |
+       VERSION_PREFIX="v"
+       VERSION_MAJOR="1"
+       UPDATE_MAJOR=$(git tag --list "${VERSION_PREFIX}${VERSION_MAJOR}.*" --sort=-version:refname | head -n 1 | grep -oE '[0-9]+$')
+       if [ -z "$UPDATE_MAJOR" ]; then
+         UPDATE_MAJOR=0
+       else
+         UPDATE_MAJOR=$((UPDATE_MAJOR + 1))
+       fi
+       NEW_TAG="${VERSION_PREFIX}${VERSION_MAJOR_MINOR}.${UPDATE_MAJOR}"
+       echo "Generated new tag: $NEW_TAG"
+       echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+   - name: Push Git Tag
+     run: |
+       git config user.name "GitHub Actions"
+       git config user.email "github-actions@users.noreply.github.com"
+       git tag $NEW_TAG
+       git push origin $NEW_TAG

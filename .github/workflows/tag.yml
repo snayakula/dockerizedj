@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+  workflow_dispatch:
 
 jobs:
   increment_tag:
@@ -24,3 +25,5 @@ jobs:
         run: |
           git tag ${{ steps.increment_tag.outputs.next_tag }}
           git push origin ${{ steps.increment_tag.outputs.next_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}

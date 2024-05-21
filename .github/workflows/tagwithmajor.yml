@@ -19,10 +19,7 @@ jobs:
        VERSION_MINOR="0"
        VERSION_PATCH="0"
        UPDATE_MAJOR=$(git tag --list "${VERSION_PREFIX}${VERSION_MAJOR}.*" --sort=-refname | head -n 1 | grep -oE '[0-9]+$')
-       if [ -z "$UPDATE_MAJOR" ]; then
-         UPDATE_MAJOR=1
-       else
-         UPDATE_MAJOR=$((UPDATE_MAJOR + 1))
+       UPDATE_MAJOR=$((UPDATE_MAJOR + 1))
        fi
        NEW_TAG="${VERSION_PREFIX}${UPDATE_MAJOR}.${VERSION_MINOR}.${VERSION_MINOR}"
        echo "Generated new tag: $NEW_TAG"

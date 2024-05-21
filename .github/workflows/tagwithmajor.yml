@@ -16,13 +16,15 @@ jobs:
      run: |
        VERSION_PREFIX="v"
        VERSION_MAJOR="1"
+       VERSION_MINOR="0"
+       VERSION_PATCH="0"
        UPDATE_MAJOR=$(git tag --list "${VERSION_PREFIX}${VERSION_MAJOR}.*" --sort=-version:refname | head -n 1 | grep -oE '[0-9]+$')
        if [ -z "$UPDATE_MAJOR" ]; then
          UPDATE_MAJOR=1
        else
          UPDATE_MAJOR=$((UPDATE_MAJOR + 1))
        fi
-       NEW_TAG="${VERSION_PREFIX}${VERSION_MAJOR_MINOR}.${UPDATE_MAJOR}"
+       NEW_TAG="${VERSION_PREFIX}${UPDATE_MAJOR}.${VERSION_MINOR}.${VERSION_MINOR}"
        echo "Generated new tag: $NEW_TAG"
        echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
    - name: Push Git Tag

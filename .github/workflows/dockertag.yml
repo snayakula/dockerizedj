@@ -42,8 +42,8 @@ jobs:
 
     - name: Push image to registry
       run: |
-        docker build -t ${{ secrets.ACR_ENDPOINT }}/${{ env.IMAGE_NAME }}:${{ env.NEW_TAG }} .
-        docker push --disable-content-trust ${{ secrets.ACR_ENDPOINT }}/${{ env.IMAGE_NAME }}:${{ env.NEW_TAG }}
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.NEW_TAG }} .
+        docker push --disable-content-trust ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ env.NEW_TAG }}
         
     # - name: Build & Push
     #   uses: docker/build-push-action@v2

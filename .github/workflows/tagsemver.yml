@@ -1,0 +1,50 @@
+name: Update Version Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version type'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  update_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get current tag version
+        id: get_tag_version
+        run: |
+          current_tag=$(git describe --abbrev=0 --tags)
+          echo "::set-output name=tag_version::$current_tag"
+
+      - name: Extract major, minor, patch versions
+        id: extract_versions
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ steps.get_tag_version.outputs.tag_version }}"
+          echo "::set-output name=major::$major"
+          echo "::set-output name=minor::$minor"
+          echo "::set-output name=patch::$patch"
+
+      - name: Update tag based on version type
+        run: |
+          case ${{ github.event.inputs.version }} in
+            major)
+              new_tag="v$((major + 1)).0.0"
+              ;;
+            minor)
+              new_tag="v${{ steps.extract_versions.outputs.major }}.$((minor + 1)).0"
+              ;;
+            patch)
+              new_tag="v${{ steps.extract_versions.outputs.major }}.${{ steps.extract_versions.outputs.minor }}.$((patch + 1))"
+              ;;
+          esac
+          git tag -a "$new_tag" HEAD
+          git push origin --tags

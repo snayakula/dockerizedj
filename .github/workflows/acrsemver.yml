@@ -45,6 +45,9 @@ jobs:
 
       - name: Update tag based on version type
         run: |
+          echo "Major: $major"
+          echo "Minor: $minor"
+          echo "Patch: $patch"
           case ${{ github.event.inputs.version }} in
             major)
               new_tag="v$((major + 1)).$((minor)).$((patch))"
@@ -56,5 +59,6 @@ jobs:
               new_tag="v$v$((major)).$((minor)).$((patch + 1))"
               ;;
           esac
+          echo "new_tag is: $new_tag"
           docker build -t imagevulacr.azurecr.io/hello-world:$new_tag .
           docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:$new_tag

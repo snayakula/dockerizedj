@@ -42,9 +42,6 @@ jobs:
           major=${version_components[0]}
           minor=${version_components[1]}
           patch=${version_components[2]:-0}
-
-      - name: Update tag based on version type
-        run: |
           echo "Major: $major"
           echo "Minor: $minor"
           echo "Patch: $patch"

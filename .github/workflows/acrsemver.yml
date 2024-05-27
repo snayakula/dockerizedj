@@ -1,0 +1,48 @@
+name: Update Version Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version type'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  update_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get current Image tag
+        run: |
+          GET_TAG=$(az acr repository show-tags --name $AzureRegistryName --repository $RepositoryName  --orderby time_desc --output tsv | head -n 1)
+          CURRENT_TAG="${GET_TAG:1}"
+          IFS="." read -ra version_components <<< "$CURRENT_TAG"
+          major=${version_components[0]}
+          minor=${version_components[1]}
+          patch=${version_components[2]:-0}
+
+      - name: Update tag based on version type
+        run: |
+          case ${{ github.event.inputs.version }} in
+            major)
+              new_tag="v$((major + 1)).$((minor)).$((patch))"
+              ;;
+            minor)
+              new_tag="v$((major)).$((minor + 1)).$((patch))"
+              ;;
+            patch)
+              new_tag="v$v$((major)).$((minor)).$((patch + 1))"
+              ;;
+          esac
+          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
+      - name: Push image to registry
+        run: |
+          docker build -t imagevulacr.azurecr.io/hello-world:${{ env.NEW_TAG }} .
+          docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:${{ env.NEW_TAG }}

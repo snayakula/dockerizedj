@@ -17,10 +17,25 @@ jobs:
   update_tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Log in to registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Get current Image tag
         run: |
+          AzureRegistryName="imagevulacr"
+          RepositoryName="hello-world"
           GET_TAG=$(az acr repository show-tags --name $AzureRegistryName --repository $RepositoryName  --orderby time_desc --output tsv | head -n 1)
           CURRENT_TAG="${GET_TAG:1}"
           IFS="." read -ra version_components <<< "$CURRENT_TAG"
@@ -42,7 +57,8 @@ jobs:
               ;;
           esac
           echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
+          
       - name: Push image to registry
         run: |
-          docker build -t imagevulacr.azurecr.io/hello-world:${{ env.NEW_TAG }} .
-          docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:${{ env.NEW_TAG }}
+          docker build -t imagevulacr.azurecr.io/hello-world:$((github.event.inputs.version))==minor"v$((major + 1)).$((minor)).$((patch))" || ((github.event.inputs.version))==patch"v$((major)).$((minor + 1)).$((patch))" || ((github.event.inputs.version))==major"v$((major)).$((minor)).$((patch + 1))") .
+          docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:$((github.event.inputs.version))==minor"v$((major + 1)).$((minor)).$((patch))" || ((github.event.inputs.version))==patch"v$((major)).$((minor + 1)).$((patch))" || ((github.event.inputs.version))==major"v$((major)).$((minor)).$((patch + 1))")

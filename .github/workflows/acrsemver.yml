@@ -56,9 +56,5 @@ jobs:
               new_tag="v$v$((major)).$((minor)).$((patch + 1))"
               ;;
           esac
-          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
-          
-      - name: Push image to registry
-        run: |
-          docker build -t imagevulacr.azurecr.io/hello-world:$((github.event.inputs.version))==minor"v$((major + 1)).$((minor)).$((patch))" || ((github.event.inputs.version))==patch"v$((major)).$((minor + 1)).$((patch))" || ((github.event.inputs.version))==major"v$((major)).$((minor)).$((patch + 1))") .
-          docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:$((github.event.inputs.version))==minor"v$((major + 1)).$((minor)).$((patch))" || ((github.event.inputs.version))==patch"v$((major)).$((minor + 1)).$((patch))" || ((github.event.inputs.version))==major"v$((major)).$((minor)).$((patch + 1))")
+          docker build -t imagevulacr.azurecr.io/hello-world:$new_tag .
+          docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:$new_tag

@@ -38,7 +38,7 @@ jobs:
           RepositoryName="hello-world"
           GET_TAG=$(az acr repository show-tags --name $AzureRegistryName --repository $RepositoryName  --orderby time_desc --output tsv | head -n 1)
           CURRENT_TAG="${GET_TAG:1}"
-          IFS="." read -ra version_components <<< "$CURRENT_TAG"
+          IFS="." read -ra version_components <<< "$CURRENT_TAG";
           major=${version_components[0]}
           minor=${version_components[1]}
           patch=${version_components[2]:-0}

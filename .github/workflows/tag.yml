@@ -1,9 +1,16 @@
-name: Tag Latest code branch
+name: New Tag to SourceCOde
 on:
- push:
-   branches:
-     - main
- workflow_dispatch:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version type'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 jobs:
  build:
    runs-on: ubuntu-latest

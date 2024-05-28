@@ -15,13 +15,13 @@ jobs:
    - name: Generate Git Tag
      id: generate_tag
      run: |
-       VERSION_PREFIX="v"
+       GET_TAG=$(git tag --list --sort=-version:refname | head -n 1)
        CURRENT_TAG="${GET_TAG:1}"
        IFS="." read -ra version_components <<< "$CURRENT_TAG";
        major=${version_components[0]}
        minor=${version_components[1]}
        patch=${version_components[2]:-0}
-       echo "Current image version (Major.Minor.Patch): $major.$minor.$patch"
+       echo "Current image version: $major.$minor.$patch"
        case ${{ github.event.inputs.version }} in
          major)
            new_tag="v$((major + 1)).$((minor)).$((patch))"

@@ -1,4 +1,4 @@
-name: ACR Image Tag
+name: Dynamic ACR Image Tag
 
 on:
   workflow_dispatch:
@@ -64,9 +64,9 @@ jobs:
             new_tag="v$v$((major)).$((minor)).$((patch + 1))"
             ;;
         esac
-        echo "new_tag is: $new_tag"
+        echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
 
     - name: Build and Push image (using input)
       run: |
-        docker build -t imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$new_tag .
-        docker push --disable-content-trust imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$new_tag
+        docker build -t imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$NEW_TAG .
+        docker push --disable-content-trust imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$NEW_TAG

@@ -1,4 +1,4 @@
-name: Update Version Tag
+name: ACR Image Tag
 
 on:
   workflow_dispatch:
@@ -12,6 +12,14 @@ on:
           - major
           - minor
           - patch
+      image:
+        description: 'Tag a image'
+        required: true
+        type: choice
+        options:
+          - hello-world
+          - mongo
+          - ubuntu
 
 jobs:
   update_tag:

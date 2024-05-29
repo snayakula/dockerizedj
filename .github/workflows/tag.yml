@@ -1,5 +1,8 @@
-name: New Tag to SourceCOde
+name: New Tag to SourceCode
 on:
+  workflow_run:
+    workflows: ['acrsemver.yml']
+    types: [completed]
   workflow_dispatch:
     inputs:
       version:

@@ -22,7 +22,7 @@ on:
           - ubuntu
 
 jobs:
-  update_tag:
+  build_tag:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -72,3 +72,4 @@ jobs:
       run: |
         docker build -t imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$NEW_TAG .
         docker push --disable-content-trust imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$NEW_TAG
+        

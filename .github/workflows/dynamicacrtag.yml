@@ -24,6 +24,8 @@ on:
 jobs:
   build_tag:
     runs-on: ubuntu-latest
+    outputs:
+      NEW_TAG: ${{ steps.set_ouput.outputs.NEW_TAG}}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -68,10 +70,12 @@ jobs:
         esac
         echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
 
-    - name: Build and Push image (using input)
+    - name: Build and Push image (using input and ouput)
+      id: set_ouput
       run: |
         docker build -t imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$NEW_TAG .
         docker push --disable-content-trust imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:$NEW_TAG
+        echo "::set_output name=NEW_TAG::$NEW_TAG"
 
   deploy:
     runs-on: ubuntu-latest
@@ -84,5 +88,6 @@ jobs:
       with:
         app-name: 'acr-webapp-helloworld2'
         publish-profile: ${{ secrets.AZ_WEBAPP_PUBLISH_PROFILE }}
-        images: 'imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:${{ env.NEW_TAG }}'
+        # images: 'imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:${{ env.NEW_TAG }}'
+        images: 'imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:${{ needs.build_tag.outputs.NEW_TAG }}'
   

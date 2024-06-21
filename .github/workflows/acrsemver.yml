@@ -35,6 +35,7 @@ jobs:
       - name: Get current Image tag
         run: |
           AzureRegistryName="imagevulacr"
+          AzureRegistryName2="copyimage"
           RepositoryName="hello-world"
           GET_TAG=$(az acr repository show-tags --name $AzureRegistryName --repository $RepositoryName  --orderby time_desc --output tsv | head -n 1)
           CURRENT_TAG="${GET_TAG:1}"
@@ -59,3 +60,20 @@ jobs:
           echo "new_tag is: $new_tag"
           docker build -t imagevulacr.azurecr.io/hello-world:$new_tag .
           docker push --disable-content-trust imagevulacr.azurecr.io/hello-world:$new_tag
+          
+      - name: Log in to registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.ACR_LOGIN_SERVER_2 }}
+          username: ${{ secrets.ACR_USERNAME_2 }}
+          password: ${{ secrets.ACR_PASSWORD_2 }}
+          
+      - name: Copy Tagged image to Stage ACR
+        run: |
+          az acr import --name $AzureRegistryName2 \
+             --source imagevulacr.azurecr.io/hello-world:$new_tag \
+             --image hello-world:$new_tag \
+             --username ${{ secrets.ACR_USERNAME_2 }} \
+             --password ${{ secrets.ACR_PASSWORD_2 }}
+
+          

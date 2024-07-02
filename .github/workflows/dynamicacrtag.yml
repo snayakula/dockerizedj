@@ -86,7 +86,7 @@ jobs:
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'acr-webapp-helloworld2'
+        app-name: 'acrimgtest'
         publish-profile: ${{ secrets.AZ_WEBAPP_PUBLISH_PROFILE }}
         # images: 'imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:${{ env.NEW_TAG }}'
         images: 'imagevulacr.azurecr.io/${{ github.event.inputs.RepositoryName }}:${{ needs.build_tag.outputs.NEW_TAG }}'

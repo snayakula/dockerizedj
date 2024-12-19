@@ -89,7 +89,7 @@ jobs:
         trivy report --input trivy-report.json --excel-file trivy-report.xlsx --beautify
     
     - name: Upload Trivy report as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: trivy-report
         path: trivy-report.xlsx

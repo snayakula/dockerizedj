@@ -1,0 +1,60 @@
+name: Repository Security Scans
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  scan-repositories:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ['dockerizedj','my-reactapp']
+        
+    steps:
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
+      - name: Checkout ${{ matrix.repo }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ matrix.repo }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ matrix.repo }}
+
+      - name: Run Trivy Scan
+        run: |
+          trivy repo \
+            --scanners vuln,secret,config,license \
+            --format json \
+            --output ./${{ matrix.repo }}_scan.json \
+            ./${{ matrix.repo }}
+
+      - name: Upload Scan Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.repo }}_trivy_report
+          path: ${{ matrix.repo }}_scan.json
+
+  bundle-reports:
+    runs-on: ubuntu-latest
+    needs: scan-repositories
+    steps:
+      - name: Download All Reports
+        uses: actions/download-artifact@v4
+        with:
+          path: trivy-reports
+
+      - name: Create Timestamped Archive
+        run: |
+          zip -r trivy-reports_$(date +'%Y-%m-%d').zip trivy-reports/
+
+      - name: Upload Final Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-trivy-reports
+          path: trivy-reports_*.zip
